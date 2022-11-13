@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
     "lint": "eslint src/**/*.ts",
-    "format": "eslint src/**/*.ts --fix"
+    "format": "eslint src/**/*.ts --fix",
+    "prepare": "husky install"
   },
   "author": "shubhamchandak8@gmail.com",
   "license": "ISC",
@@ -28,10 +29,5 @@
     "nodemon": "^2.0.20",
     "prettier": "2.7.1",
     "typescript": "^4.8.4"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
   }
 }
