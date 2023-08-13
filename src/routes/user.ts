@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
-import { createNewUser, getUserByEmail } from '../services/userService';
-import { authenticate } from '../middleware/auth';
+import { createNewUser, getUserByEmail } from '../services/userService.js';
+import { authenticate } from '../middleware/auth.js';
 import { assert } from 'console';
-import { ICreateNewUserRequest } from '../models/apimodels';
+import { ICreateNewUserRequest } from '../models/apimodels.js';
 
 const router = express.Router();
 

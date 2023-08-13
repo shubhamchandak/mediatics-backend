@@ -1,5 +1,5 @@
 import * as mysql from 'mysql2/promise'
-import { IUserDetails } from '../models/dbmodels';
+import { IUserDetails } from '../models/dbmodels.js';
 
 var connection = await mysql.createConnection({
     host     :  process.env.DB_HOST,

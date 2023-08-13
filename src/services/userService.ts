@@ -1,8 +1,8 @@
-import * as dbService from "../datalayer/db_service";
-import { ICreateNewUserRequest } from "../models/apimodels";
-import { IUserDetails } from "../models/dbmodels";
-import { ServiceResponse } from "../models/serviceResponse";
-import { isNullOrEmpty, validateEmail } from "../utils/utils";
+import * as dbService from "../datalayer/db_service.js";
+import { ICreateNewUserRequest } from "../models/apimodels.js";
+import { IUserDetails } from "../models/dbmodels.js";
+import { ServiceResponse } from "../models/serviceResponse.js";
+import { isNullOrEmpty, validateEmail } from "../utils/utils.js";
 
 export async function getUserByEmail(email: string): Promise<ServiceResponse> {
     email = email.trim();

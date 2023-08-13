@@ -2,10 +2,10 @@ import express, { Express, NextFunction, Request, Response } from 'express'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser';
 
-import { authenticate } from './middleware/auth'
-import userRouter from './routes/user';
-
 dotenv.config()
+
+import userRouter from './routes/user.js';
+
 
 const app: Express = express()
 
