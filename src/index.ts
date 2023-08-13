@@ -26,10 +26,6 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
 
 })
 
-app.use('/getCommentsAnalytics', authenticate, (req: Request, res: Response, next: NextFunction) => {
-  res.send('Hello World!!!!!!234')
-})
-
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`!)
 })
