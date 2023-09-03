@@ -1,4 +1,9 @@
 export interface ServiceResponse {
     data?: any;
-    error?: string;    
+    error?: ServiceError   
+}
+
+export interface ServiceError {
+    message: string;
+    errorCode: number;
 }

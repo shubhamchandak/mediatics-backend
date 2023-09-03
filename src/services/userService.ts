@@ -7,21 +7,21 @@ import { isNullOrEmpty, validateEmail } from "../utils/utils.js";
 export async function getUserByEmail(email: string): Promise<ServiceResponse> {
     email = email.trim();
     if(isNullOrEmpty(email) || !validateEmail(email)) {
-        return errorResponse("Email is not valid!");
+        return errorResponse("Email is not valid!", 400);
     }
     const userDetails = await dbService.getUserByEmail(email);
     if(isNullOrEmpty(userDetails)) {
-        return errorResponse("User does not exist!");
+        return errorResponse("User does not exist!", 404);
     }
     return successResponse(userDetails);
 }
 
 export async function createNewUser(request: ICreateNewUserRequest): Promise<ServiceResponse> {
     if(isNullOrEmpty(request.firstName) || isNullOrEmpty(request.lastName)) {
-        return errorResponse("First and Last Name cannot be empty!")
+        return errorResponse("First and Last Name cannot be empty!", 400)
     }
     if(isNullOrEmpty(request.email) || !validateEmail(request.email)) {
-        return errorResponse("Email is not valid!");
+        return errorResponse("Email is not valid!", 400);
     }
     const userDetails: IUserDetails = {
         firstName: request.firstName,
@@ -35,8 +35,11 @@ export async function createNewUser(request: ICreateNewUserRequest): Promise<Ser
     return successResponse();
 }
 
-function errorResponse(error: string): ServiceResponse {
-    return {error: error};
+function errorResponse(message: string, errorCode: number): ServiceResponse {
+    return {error: {
+        message: message,
+        errorCode: errorCode
+    }};
 }
 
 function successResponse(data?: any): ServiceResponse {
