@@ -12,6 +12,8 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
             req.body = {};
         }
         req.body["session"] = data;
+        req.body["session"]["firstName"] = data?.given_name;
+        req.body["session"]["lastName"] = data?.family_name;
         console.log("session: ", req.body["session"]);
         next();
     })
