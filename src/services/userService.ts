@@ -2,6 +2,7 @@ import * as dbService from "../datalayer/db_service.js";
 import { ICreateNewUserRequest } from "../models/apimodels.js";
 import { IUserDetails } from "../models/dbmodels.js";
 import { ServiceResponse } from "../models/serviceResponse.js";
+import { errorResponse, successResponse } from "../utils/serviceUtils.js";
 import { isNullOrEmpty, validateEmail } from "../utils/utils.js";
 
 export async function getUserByEmail(email: string): Promise<ServiceResponse> {
@@ -33,15 +34,4 @@ export async function createNewUser(request: ICreateNewUserRequest): Promise<Ser
     }
     const response = dbService.createNewUser(userDetails);
     return successResponse();
-}
-
-function errorResponse(message: string, errorCode: number): ServiceResponse {
-    return {error: {
-        message: message,
-        errorCode: errorCode
-    }};
-}
-
-function successResponse(data?: any): ServiceResponse {
-    return {data: isNullOrEmpty(data) ? {} : data};
 }

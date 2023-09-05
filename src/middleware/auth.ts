@@ -1,24 +1,22 @@
 import { Request, Response, NextFunction } from 'express'
 import { OAuth2Client } from 'google-auth-library'; 
+import { isNullOrEmpty } from '../utils/utils.js';
 const client = new OAuth2Client();
 
 export async function authenticate(req: Request, res: Response, next: NextFunction) {
-    console.log("cookies:", req.cookies);
     const id_token = req.cookies["id_token"];
     verify(id_token)
     .then(data => {
-        console.log(data);
-        if(!req.body) {
+        if(isNullOrEmpty(req.body)) {
             req.body = {};
         }
         req.body["session"] = data;
         req.body["session"]["firstName"] = data?.given_name;
         req.body["session"]["lastName"] = data?.family_name;
-        console.log("session: ", req.body["session"]);
         next();
     })
     .catch(err => {
-        // console.log(err);
+        console.log(err);
         res.status(401).json({
             message: "Authentication failed!"
         })

@@ -5,9 +5,12 @@ import cookieParser from 'cookie-parser';
 dotenv.config()
 
 import userRouter from './routes/user.js';
-
+import dataRouter from './routes/data.js';
+import { authenticate } from './middleware/auth.js';
 
 const app: Express = express()
+app.use(express.json());
+
 
 const port = process.env.PORT || 3000
 
@@ -19,7 +22,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.use('/user', userRouter);
+app.use('/user', authenticate, userRouter);
+app.use('/data', authenticate, dataRouter);
 
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!!!!!!!')

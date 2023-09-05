@@ -1,54 +1,42 @@
 import express, { Request, Response } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import { getIntentCount, getOffensiveCount, getSentimentCount, getUserVideos, getVideoDetails } from '../services/dataService.js';
+import { sendResponse } from '../utils/routerUtils.js';
 
 const router = express.Router();
 
-router.get('/getSentimentCount', authenticate, async (req: Request, res: Response) => {
+router.get('/getSentimentCount', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const videoId = req.body["videoId"]
-  const response = await getSentimentCount(videoId, email)
-  if(response.error) {
-    res.status(response.error.errorCode).json({message: response.error});
-  }
-  res.status(200).json({data: response.data});
+  const videoId = req.body["videoId"];
+  const result = await getSentimentCount(videoId, email)
+  sendResponse(result, res);
 });
 
-router.get('/getIntentCount', authenticate, async (req: Request, res: Response) => {
+router.get('/getIntentCount', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
   const videoId = req.body["videoId"]
-  const response = await getIntentCount(videoId, email)
-  if(response.error) {
-    res.status(response.error.errorCode).json({message: response.error});
-  }
-  res.status(200).json({data: response.data});
+  const result = await getIntentCount(videoId, email)
+  sendResponse(result, res);
 });
 
-router.get('/getOffensiveCount', authenticate, async (req: Request, res: Response) => {
+router.get('/getOffensiveCount', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
   const videoId = req.body["videoId"]
-  const response = await getOffensiveCount(videoId, email)
-  if(response.error) {
-    res.status(response.error.errorCode).json({message: response.error});
-  }
-  res.status(200).json({data: response.data});
+  const result = await getOffensiveCount(videoId, email)
+  sendResponse(result, res);
 });
 
-router.get('/getVideoDetails', authenticate, async (req: Request, res: Response) => {
+router.get('/getVideoDetails', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
   const videoId = req.body["videoId"]
-  const response = await getVideoDetails(videoId, email)
-  if(response.error) {
-    res.status(response.error.errorCode).json({message: response.error});
-  }
-  res.status(200).json({data: response.data});
+  const result = await getVideoDetails(videoId, email)
+  sendResponse(result, res);
 });
 
-router.get('/getUserVideos', authenticate, async (req: Request, res: Response) => {
+router.get('/getUserVideos', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const response = await getUserVideos(email)
-  if(response.error) {
-    res.status(response.error.errorCode).json({message: response.error});
-  }
-  res.status(200).json({data: response.data});
+  const result = await getUserVideos(email)
+  sendResponse(result, res);
 });
+
+export default router;

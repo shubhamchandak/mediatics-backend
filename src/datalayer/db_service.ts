@@ -19,7 +19,11 @@ export async function getUserByEmail(email: string): Promise<IUserDetails | null
 }
 
 export async function getUserVideosByEmail(email: string): Promise<IVideoDetails[]> {
-  const query = 'SELECT * FROM youtube_video_details WHERE videoId in (SELECT uvm.videoId FROM user_video_mapping uvm INNER JOIN user_details ud ON uvm.userId = ud.userId WHERE ud.email = ?)';
+  const query = `SELECT * FROM youtube_video_details WHERE videoId in 
+                (SELECT uvm.videoId 
+                FROM user_video_mapping uvm 
+                INNER JOIN user_details ud ON uvm.userId = ud.userId 
+                WHERE ud.email = ?)`;
   const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [email]);
   return rows as IVideoDetails[];
 }
@@ -29,9 +33,10 @@ export async function createNewUser(userDetails: IUserDetails): Promise<boolean>
   try {
     const createdOn = userDetails.createdOn.toISOString().slice(0, 19).replace("T", " ");
     const updatedOn = userDetails.updatedOn.toISOString().slice(0, 19).replace("T", " ");
-    await connection.execute(query, [userDetails.firstName, userDetails.lastName, userDetails.email, createdOn, updatedOn]);
+    await connection.execute(query, [userDetails.firstName, userDetails.lastName, userDetails.email, createdOn, updatedOn, 1]);
   } catch(error) {
     console.log("Error inserting into database!", query, userDetails);
+    console.log(error);
     return false;
   }
   return true;
