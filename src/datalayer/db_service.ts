@@ -31,8 +31,8 @@ export async function getUserVideosByEmail(email: string): Promise<IVideoDetails
 export async function createNewUser(userDetails: IUserDetails): Promise<boolean> {
   const query = 'INSERT INTO user_details (firstName, lastName, email, createdOn, updatedOn, status) VALUES (?, ?, ?, ?, ?, ?)';
   try {
-    const createdOn = userDetails.createdOn.toISOString().slice(0, 19).replace("T", " ");
-    const updatedOn = userDetails.updatedOn.toISOString().slice(0, 19).replace("T", " ");
+    const createdOn = getMySqlTimeString(userDetails.createdOn)
+    const updatedOn = getMySqlTimeString(userDetails.updatedOn)
     await connection.execute(query, [userDetails.firstName, userDetails.lastName, userDetails.email, createdOn, updatedOn, 1]);
   } catch(error) {
     console.log("Error inserting into database!", query, userDetails);
@@ -78,4 +78,35 @@ export async function getOffensiveCountByVideoId(videoId: string, email: string)
                 WHERE yc.videoId = ? AND ud.email = ? GROUP BY offensive`;
   const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [videoId, email]);
   return rows as IOffensiveCount[];
+}
+
+/// return true if video needs to be processed and false if it has been already processed for analysis
+export async function processVideoByVideoId(videoId: string, createdOn: Date, email: string): Promise<boolean> {
+  // return if videoId already exist/inprogress for given user
+  const query1 = `SELECT * FROM user_video_mapping uvm
+                  JOIN user_details ud ON uvm.userId = ud.userId 
+                  WHERE uvm.videoId=? AND ud.email=?`;
+  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query1, [videoId, email]);
+  if(rows.length > 0) {
+    return false;
+  }
+
+  // insert into user_video_mapping table
+  const query2 = `INSERT INTO user_video_mapping (videoId, userId, createdOn)
+                  SELECT ?, userId, ? FROM user_details
+                  WHERE email = ?`;
+  const createdOnString = getMySqlTimeString(createdOn);
+  await connection.execute(query2, [videoId, createdOnString, email]);
+
+  // check if videoId already exist/processed previously
+  const query3 = `SELECT * FROM user_video_mapping WHERE videoId = ? LIMIT 2`
+  const [rows3, _3]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query3, [videoId]);
+  if(rows3.length > 1) {
+    return false;
+  }
+  return true;
+}
+
+function getMySqlTimeString(datetime: Date): string {
+  return datetime.toISOString().slice(0, 19).replace("T", " ");
 }

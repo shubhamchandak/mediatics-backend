@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
-import { authenticate } from '../middleware/auth.js';
-import { getIntentCount, getOffensiveCount, getSentimentCount, getUserVideos, getVideoDetails } from '../services/dataService.js';
+import { getIntentCount, getOffensiveCount, getSentimentCount, getUserVideos, getVideoDetails, processVideo } from '../services/dataService.js';
 import { sendResponse } from '../utils/routerUtils.js';
 
 const router = express.Router();
@@ -36,6 +35,13 @@ router.get('/getVideoDetails', async (req: Request, res: Response) => {
 router.get('/getUserVideos', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
   const result = await getUserVideos(email)
+  sendResponse(result, res);
+});
+
+router.post('/processVideo', async (req: Request, res: Response) => {
+  const email = req.body['session']['email'];
+  const videoUrl = req.body["videoUrl"]
+  const result = await processVideo(videoUrl, email)
   sendResponse(result, res);
 });
 
