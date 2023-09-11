@@ -1,5 +1,5 @@
 import * as mysql from 'mysql2/promise'
-import { IIntentCount, IOffensiveCount, ISentimentCount, IUserDetails, IVideoDetails } from '../models/dbmodels.js';
+import { IIntentCount, IOffensiveCount, ISentimentCount, IUserDetails, IVideoDetails, IYoutubeComment, IYoutubeComments } from '../models/dbmodels.js';
 
 var connection = await mysql.createConnection({
     host     :  process.env.DB_HOST,
@@ -11,7 +11,6 @@ var connection = await mysql.createConnection({
 
 export async function getUserByEmail(email: string): Promise<IUserDetails | null> {
     const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute('SELECT * FROM user_details WHERE email = ?', [email]);
-    console.log(rows);
     if(rows.length == 0) {
       return null;
     }
@@ -35,7 +34,6 @@ export async function createNewUser(userDetails: IUserDetails): Promise<boolean>
     const updatedOn = getMySqlTimeString(userDetails.updatedOn)
     await connection.execute(query, [userDetails.firstName, userDetails.lastName, userDetails.email, createdOn, updatedOn, 1]);
   } catch(error) {
-    console.log("Error inserting into database!", query, userDetails);
     console.log(error);
     return false;
   }
@@ -43,7 +41,7 @@ export async function createNewUser(userDetails: IUserDetails): Promise<boolean>
 }
 
 export async function getVideoDetails(videoId: string, email: string): Promise<IVideoDetails | null> {
-  const query = `SELECT * FROM youtube_video_details yvd
+  const query = `SELECT yvd.* FROM youtube_video_details yvd
                 JOIN user_video_mapping uvm ON yvd.videoId = uvm.videoId
                 JOIN user_details ud ON uvm.userId = ud.userId
                 WHERE yvd.videoId = ? AND ud.email = ?`;
@@ -78,6 +76,37 @@ export async function getOffensiveCountByVideoId(videoId: string, email: string)
                 WHERE yc.videoId = ? AND ud.email = ? GROUP BY offensive`;
   const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [videoId, email]);
   return rows as IOffensiveCount[];
+}
+
+export async function getPendingVideoIdsByUser(email: string): Promise<string[]> {
+  const query = `SELECT uvm.videoId FROM user_video_mapping uvm
+                JOIN user_details ud ON uvm.userId = ud.userId
+                WHERE ud.email = ? AND uvm.videoId NOT IN (SELECT DISTINCT videoId FROM youtube_video_details)`
+  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [email]);
+  return rows.map(x => x["videoId"]);
+}
+
+export async function getCommentsByVideoId(videoId: string, pageNumber: number, recordsPerPage: number, email: string): Promise<IYoutubeComments | null> {
+  const offset = (pageNumber-1) * recordsPerPage;
+  const query = `SELECT yc.*, COUNT(*) OVER() as totalCount FROM youtube_comments yc
+                JOIN user_video_mapping uvm ON yc.videoId = uvm.videoId
+                JOIN user_details ud ON ud.userId = uvm.userId
+                WHERE yc.videoId = ? AND ud.email = ? GROUP BY yc.id, uvm.userId LIMIT ? , ?`
+  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [videoId, email, offset.toString(), recordsPerPage.toString()]);
+  if(rows.length == 0) {
+    return null;
+  }
+  const totalCount = rows[0]["totalCount"]
+  const comments = rows.map(x => {
+    delete x["id"];
+    delete x["totalCount"];
+    return x;
+  })
+  const response: IYoutubeComments = {
+    totalCount: totalCount,
+    comments: comments as IYoutubeComment[],
+  }
+  return response;
 }
 
 /// return true if video needs to be processed and false if it has been already processed for analysis

@@ -49,6 +49,25 @@ export async function getUserVideos(email: string): Promise<ServiceResponse>  {
     return successResponse(response)
 }
 
+export async function getPendingVideoIds(email: string) {
+    const response = await dbService.getPendingVideoIdsByUser(email);
+    return successResponse(response);
+}
+
+export async function getComments(videoId: string, pageNumber: number, recordsPerPage: number, email: string) {
+    if(isNullOrEmpty(videoId) || isNullOrEmpty(pageNumber) || isNullOrEmpty(recordsPerPage)) {
+        return errorResponse("videoId, pageNumber and recordsPerPage are required!", 400);
+    }
+    if(pageNumber < 1 || recordsPerPage < 1) {
+        return errorResponse("pageNumber and recordsPerPage should be greater than zero!", 400);
+    }
+    const response = await dbService.getCommentsByVideoId(videoId, pageNumber, recordsPerPage, email);
+    if(isNullOrEmpty(response)) {
+        return errorResponse("Data not found!", 404);
+    }
+    return successResponse(response);
+}
+
 export async function processVideo(videoUrl: string, email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(videoUrl)) {
         return errorResponse("Video url is required!", 400);
@@ -63,5 +82,4 @@ export async function processVideo(videoUrl: string, email: string): Promise<Ser
         // call queueService to process videoId by MLService 
     }
     return successResponse();
-    
 }

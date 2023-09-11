@@ -41,3 +41,30 @@ export interface IOffensiveCount {
     offensive : string;
     count : number;
 }
+
+export interface IYoutubeComment {
+    commentId : string;
+    comment : string;
+    textOriginal : string;
+    authorChannelUrl : string;
+    authorProfileImageUrl : string;
+    authorDisplayName : string;
+    authorChannelId : string;
+    likeCount : number;
+    publishedAt : Date;
+    updatedAt : Date;
+    totalReplyCount : number;
+    videoId : string;
+    Sentiment : string;
+    Offensive : string;
+    Intent : string;
+    sentiment_score : number;
+    intent_score : number;
+    offense_score : number;
+    addedAt : Date;
+}
+
+export interface IYoutubeComments {
+    totalCount: number;
+    comments: IYoutubeComment[];
+}
