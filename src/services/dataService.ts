@@ -7,7 +7,7 @@ import assert from "assert";
 
 export async function getSentimentCount(videoId: string, email: string): Promise<ServiceResponse>  {
     videoId = videoId?.trim();
-    const response = dbService.getSentimentCountByVideoId(videoId, email);
+    const response = await dbService.getSentimentCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
@@ -16,7 +16,7 @@ export async function getSentimentCount(videoId: string, email: string): Promise
 
 export async function getIntentCount(videoId: string, email: string): Promise<ServiceResponse>  {
     videoId = videoId?.trim();
-    const response = dbService.getIntentCountByVideoId(videoId, email);
+    const response = await dbService.getIntentCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
@@ -25,7 +25,7 @@ export async function getIntentCount(videoId: string, email: string): Promise<Se
 
 export async function getOffensiveCount(videoId: string, email: string): Promise<ServiceResponse>  {
     videoId = videoId?.trim();
-    const response = dbService.getOffensiveCountByVideoId(videoId, email);
+    const response = await dbService.getOffensiveCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
@@ -34,7 +34,7 @@ export async function getOffensiveCount(videoId: string, email: string): Promise
 
 export async function getVideoDetails(videoId: string, email: string): Promise<ServiceResponse>  {
     videoId = videoId?.trim();
-    const response = dbService.getVideoDetails(videoId, email);
+    const response = await dbService.getVideoDetails(videoId, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
@@ -42,7 +42,7 @@ export async function getVideoDetails(videoId: string, email: string): Promise<S
 }
 
 export async function getUserVideos(email: string): Promise<ServiceResponse>  {
-    const response = dbService.getUserVideosByEmail(email);
+    const response = await dbService.getUserVideosByEmail(email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
