@@ -6,7 +6,9 @@ import { errorResponse, successResponse } from "../utils/serviceUtils.js";
 import assert from "assert";
 
 export async function getSentimentCount(videoId: string, email: string): Promise<ServiceResponse>  {
-    videoId = videoId?.trim();
+    if(isNullOrEmpty(videoId)) {
+        return errorResponse("VideoId is required!", 400);
+    }
     const response = await dbService.getSentimentCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
@@ -15,7 +17,9 @@ export async function getSentimentCount(videoId: string, email: string): Promise
 }
 
 export async function getIntentCount(videoId: string, email: string): Promise<ServiceResponse>  {
-    videoId = videoId?.trim();
+    if(isNullOrEmpty(videoId)) {
+        return errorResponse("VideoId is required!", 400);
+    }
     const response = await dbService.getIntentCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
@@ -24,7 +28,9 @@ export async function getIntentCount(videoId: string, email: string): Promise<Se
 }
 
 export async function getOffensiveCount(videoId: string, email: string): Promise<ServiceResponse>  {
-    videoId = videoId?.trim();
+    if(isNullOrEmpty(videoId)) {
+        return errorResponse("VideoId is required!", 400);
+    }
     const response = await dbService.getOffensiveCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
@@ -33,7 +39,9 @@ export async function getOffensiveCount(videoId: string, email: string): Promise
 }
 
 export async function getVideoDetails(videoId: string, email: string): Promise<ServiceResponse>  {
-    videoId = videoId?.trim();
+    if(isNullOrEmpty(videoId)) {
+        return errorResponse("VideoId is required!", 400);
+    }
     const response = await dbService.getVideoDetails(videoId, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
@@ -54,9 +62,14 @@ export async function getPendingVideoIds(email: string) {
     return successResponse(response);
 }
 
-export async function getComments(videoId: string, pageNumber: number, recordsPerPage: number, email: string) {
-    if(isNullOrEmpty(videoId) || isNullOrEmpty(pageNumber) || isNullOrEmpty(recordsPerPage)) {
+export async function getComments(videoId: string, pageNumberString: string, recordsPerPageString: string, email: string) {
+    if(isNullOrEmpty(videoId) || isNullOrEmpty(pageNumberString) || isNullOrEmpty(recordsPerPageString)) {
         return errorResponse("videoId, pageNumber and recordsPerPage are required!", 400);
+    }
+    const pageNumber = Number(pageNumberString);
+    const recordsPerPage = Number(recordsPerPageString);
+    if(!(Number.isInteger(pageNumber) && Number.isInteger(recordsPerPage))) {
+        return errorResponse("pageNumber and recordsPerPage should be valid integers!", 400);
     }
     if(pageNumber < 1 || recordsPerPage < 1) {
         return errorResponse("pageNumber and recordsPerPage should be greater than zero!", 400);

@@ -6,28 +6,28 @@ const router = express.Router();
 
 router.get('/getSentimentCount', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const videoId = req.body["videoId"];
+  const videoId = req.params["videoId"];
   const result = await getSentimentCount(videoId, email)
   sendResponse(result, res);
 });
 
 router.get('/getIntentCount', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const videoId = req.body["videoId"]
+  const videoId = req.params["videoId"]
   const result = await getIntentCount(videoId, email)
   sendResponse(result, res);
 });
 
 router.get('/getOffensiveCount', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const videoId = req.body["videoId"]
+  const videoId = req.params["videoId"]
   const result = await getOffensiveCount(videoId, email)
   sendResponse(result, res);
 });
 
 router.get('/getVideoDetails', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const videoId = req.body["videoId"]
+  const videoId = req.params["videoId"]
   const result = await getVideoDetails(videoId, email)
   sendResponse(result, res);
 });
@@ -46,9 +46,9 @@ router.get('/getPendingVideoIds', async (req: Request, res: Response) => {
 
 router.get('/getComments', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const videoId = req.body["videoId"];
-  const pageNumber = req.body["pageNumber"];
-  const recordsPerPage = req.body["recordsPerPage"];
+  const videoId = req.params["videoId"];
+  const pageNumber = req.params["pageNumber"];
+  const recordsPerPage = req.params["recordsPerPage"];
   const result = await getComments(videoId, pageNumber, recordsPerPage, email);
   sendResponse(result, res);
 });
