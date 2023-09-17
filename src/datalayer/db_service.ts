@@ -52,7 +52,7 @@ export async function getVideoDetails(videoId: string, email: string): Promise<I
 }
 
 export async function getSentimentCountByVideoId(videoId: string, email: string): Promise<ISentimentCount[]> {
-  const query = `SELECT Sentiment AS sentiment, COUNT(*) AS count FROM youtube_comments yc
+  const query = `SELECT Sentiment AS type, COUNT(*) AS count FROM youtube_comments yc
                 JOIN user_video_mapping uvm ON uvm.videoId = yc.videoId
                 JOIN user_details ud ON uvm.userId = ud.userId 
                 WHERE yc.videoId = ? AND ud.email = ? GROUP BY sentiment`;
@@ -61,7 +61,7 @@ export async function getSentimentCountByVideoId(videoId: string, email: string)
 }
 
 export async function getIntentCountByVideoId(videoId: string, email: string): Promise<IIntentCount[]> {
-  const query = `SELECT Intent AS intent, COUNT(*) AS count FROM youtube_comments yc
+  const query = `SELECT Intent AS type, COUNT(*) AS count FROM youtube_comments yc
                 JOIN user_video_mapping uvm ON uvm.videoId = yc.videoId
                 JOIN user_details ud ON uvm.userId = ud.userId 
                 WHERE yc.videoId = ? AND ud.email = ? GROUP BY intent`;
@@ -70,7 +70,7 @@ export async function getIntentCountByVideoId(videoId: string, email: string): P
 }
 
 export async function getOffensiveCountByVideoId(videoId: string, email: string): Promise<IOffensiveCount[]> {
-  const query = `SELECT Offensive AS offensive, COUNT(*) AS count FROM youtube_comments yc
+  const query = `SELECT Offensive AS type, COUNT(*) AS count FROM youtube_comments yc
                 JOIN user_video_mapping uvm ON uvm.videoId = yc.videoId
                 JOIN user_details ud ON uvm.userId = ud.userId 
                 WHERE yc.videoId = ? AND ud.email = ? GROUP BY offensive`;

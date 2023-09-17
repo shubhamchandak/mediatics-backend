@@ -28,17 +28,17 @@ export interface IVideoDetails {
 }
 
 export interface ISentimentCount {
-    sentiment : string;
+    type : string;
     count : number;
 }
 
 export interface IIntentCount {
-    intent : string;
+    type : string;
     count : number;
 }
 
 export interface IOffensiveCount {
-    offensive : string;
+    type : string;
     count : number;
 }
 

@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import { createNewUser, getUserByEmail } from '../services/userService.js';
-import { authenticate } from '../middleware/auth.js';
 import { assert } from 'console';
 import { ICreateNewUserRequest } from '../models/apimodels.js';
 import { sendResponse } from '../utils/routerUtils.js';
@@ -13,14 +12,12 @@ router.get('/', (req, res) => {
 });
 
 router.get('/getUserDetails', async (req: Request, res: Response) => {
-  assert(req.body && req.body['session'], "Session not found!");
   const email = req.body['session']['email'];
   const result = await getUserByEmail(email)
   sendResponse(result, res)
 });
 
 router.post('/createNewUser', async (req: Request, res: Response) => {
-  assert(req.body && req.body['session'], "Session not found!");
   const session = req.body['session'];
   const userRequest: ICreateNewUserRequest = {
     email: session['email'],

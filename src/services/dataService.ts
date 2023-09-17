@@ -7,7 +7,7 @@ import assert from "assert";
 
 export async function getSentimentCount(videoId: string, email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(videoId)) {
-        return errorResponse("VideoId is required!", 400);
+        return errorResponse("videoId is required!", 400);
     }
     const response = await dbService.getSentimentCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
@@ -18,7 +18,7 @@ export async function getSentimentCount(videoId: string, email: string): Promise
 
 export async function getIntentCount(videoId: string, email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(videoId)) {
-        return errorResponse("VideoId is required!", 400);
+        return errorResponse("videoId is required!", 400);
     }
     const response = await dbService.getIntentCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
@@ -29,7 +29,7 @@ export async function getIntentCount(videoId: string, email: string): Promise<Se
 
 export async function getOffensiveCount(videoId: string, email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(videoId)) {
-        return errorResponse("VideoId is required!", 400);
+        return errorResponse("videoId is required!", 400);
     }
     const response = await dbService.getOffensiveCountByVideoId(videoId, email);
     if(isNullOrEmpty(response)) {
@@ -40,7 +40,7 @@ export async function getOffensiveCount(videoId: string, email: string): Promise
 
 export async function getVideoDetails(videoId: string, email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(videoId)) {
-        return errorResponse("VideoId is required!", 400);
+        return errorResponse("videoId is required!", 400);
     }
     const response = await dbService.getVideoDetails(videoId, email);
     if(isNullOrEmpty(response)) {
