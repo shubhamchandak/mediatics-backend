@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/getSentimentCount', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const videoId = req.params["videoId"];
+  const videoId = req.query["videoId"] as string;
   const result = await getSentimentCount(videoId, email)
   sendResponse(result, res);
 });
