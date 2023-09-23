@@ -17,7 +17,7 @@ const port = process.env.PORT || 3000
 app.use(cookieParser());
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const origin = req.protocol + '://' + req.get('host');
+  const origin = req.protocol + '://' + req.hostname;
   res.header("Access-Control-Allow-Origin", process.env.ALLOWED_ORIGINS || origin);
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
