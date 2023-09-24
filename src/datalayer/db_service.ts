@@ -1,5 +1,7 @@
 import * as mysql from 'mysql2/promise'
 import { IIntentCount, IOffensiveCount, ISentimentCount, IUserDetails, IVideoDetails, IYoutubeComment, IYoutubeComments } from '../models/dbmodels.js';
+import { IGetCommentsRequest } from '../models/apimodels.js';
+import { isNullOrEmpty } from '../utils/utils.js';
 
 var connection = await mysql.createConnection({
     host     :  process.env.DB_HOST,
@@ -86,13 +88,28 @@ export async function getPendingVideoIdsByUser(email: string): Promise<string[]>
   return rows.map(x => x["videoId"]);
 }
 
-export async function getCommentsByVideoId(videoId: string, pageNumber: number, recordsPerPage: number, email: string): Promise<IYoutubeComments | null> {
-  const offset = (pageNumber-1) * recordsPerPage;
-  const query = `SELECT yc.*, COUNT(*) OVER() as totalCount FROM youtube_comments yc
+export async function getCommentsByVideoId(request: IGetCommentsRequest, email: string): Promise<IYoutubeComments | null> {
+  const offset = (request.pageNumber-1) * request.recordsPerPage;
+  const queryParams = [];
+  let query = `SELECT yc.*, COUNT(*) OVER() as totalCount FROM youtube_comments yc
                 JOIN user_video_mapping uvm ON yc.videoId = uvm.videoId
                 JOIN user_details ud ON ud.userId = uvm.userId
-                WHERE yc.videoId = ? AND ud.email = ? GROUP BY yc.id, uvm.userId LIMIT ? , ?`
-  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [videoId, email, offset.toString(), recordsPerPage.toString()]);
+                WHERE yc.videoId = ? AND ud.email = ? `;
+  queryParams.push(...[request.videoId, email]);
+  if(isNullOrEmpty(request.columnFilters)) {
+    request.columnFilters.map(filter => {
+      filter.field = filter.field?.trim();
+      if(['Sentiment', 'Offensive', 'Intent'].indexOf(filter.field) != -1 && !isNullOrEmpty(filter.values)) {
+        query += ` AND ${filter.field} IN ( ? ) `;
+        queryParams.push(`'${ filter.values.filter(v => v != null).join("','") }'`);
+      }
+    });
+  }
+  query += ` GROUP BY yc.id, uvm.userId LIMIT ? , ?`;
+  queryParams.push(...[offset.toString(), request.recordsPerPage.toString()]);
+  console.log("query: ", query);
+  console.log("params: ", queryParams);
+  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, queryParams);
   if(rows.length == 0) {
     return null;
   }

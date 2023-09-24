@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { getComments, getIntentCount, getOffensiveCount, getPendingVideoIds, getSentimentCount, getUserVideos, getVideoDetails, processVideo } from '../services/dataService.js';
 import { sendResponse } from '../utils/routerUtils.js';
+import { IGetCommentsRequest } from '../models/apimodels.js';
 
 const router = express.Router();
 
@@ -44,12 +45,10 @@ router.get('/getPendingVideoIds', async (req: Request, res: Response) => {
   sendResponse(result, res);
 });
 
-router.get('/getComments', async (req: Request, res: Response) => {
+router.post('/getComments', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const videoId = req.query["videoId"] as string;
-  const pageNumber = req.query["pageNumber"] as string;
-  const recordsPerPage = req.query["recordsPerPage"] as string;
-  const result = await getComments(videoId, pageNumber, recordsPerPage, email);
+  const getCommentsRequest: IGetCommentsRequest = req.body as IGetCommentsRequest;
+  const result = await getComments(getCommentsRequest, email);
   sendResponse(result, res);
 });
 

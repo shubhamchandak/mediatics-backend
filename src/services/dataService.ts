@@ -4,6 +4,7 @@ import * as dbService from "../datalayer/db_service.js";
 import { isNullOrEmpty } from "../utils/utils.js";
 import { errorResponse, successResponse } from "../utils/serviceUtils.js";
 import assert from "assert";
+import { IGetCommentsRequest } from "../models/apimodels.js";
 
 export async function getSentimentCount(videoId: string, email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(videoId)) {
@@ -62,13 +63,11 @@ export async function getPendingVideoIds(email: string) {
     return successResponse(response);
 }
 
-export async function getComments(videoId: string, pageNumberString: string, recordsPerPageString: string, email: string) {
-    if(isNullOrEmpty(videoId) || isNullOrEmpty(pageNumberString) || isNullOrEmpty(recordsPerPageString)) {
+export async function getComments(request: IGetCommentsRequest, email: string) {
+    if(isNullOrEmpty(request.videoId) || isNullOrEmpty(request.pageNumber) || isNullOrEmpty(request.recordsPerPage)) {
         return errorResponse("videoId, pageNumber and recordsPerPage are required!", 400);
     }
-    const pageNumber = Number(pageNumberString);
-    const recordsPerPage = Number(recordsPerPageString);
-    if(!(Number.isInteger(pageNumber) && Number.isInteger(recordsPerPage))) {
+    if(!(Number.isInteger(request.pageNumber) && Number.isInteger(request.recordsPerPage))) {
         return errorResponse("pageNumber and recordsPerPage should be valid integers!", 400);
     }
     if(pageNumber < 1 || recordsPerPage < 1) {

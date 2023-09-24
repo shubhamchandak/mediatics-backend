@@ -13,8 +13,8 @@ const app: Express = express()
 const whitelistedOrigins = process.env.ALLOWED_ORIGINS?.split(" ").join(",").split(";").join(",").split(",");
 const corsOptions: CorsOptions = {
   origin: function(origin, callback){
-      const isOriginWhitelisted = whitelistedOrigins.indexOf(origin || "") !== -1;
-      callback(null, isOriginWhitelisted);
+    const isOriginWhitelisted = whitelistedOrigins.indexOf(origin || "") !== -1;
+    callback(null, isOriginWhitelisted);
   },
   credentials: true
 };
