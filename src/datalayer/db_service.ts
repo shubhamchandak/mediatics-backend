@@ -89,6 +89,7 @@ export async function getPendingVideoIdsByUser(email: string): Promise<string[]>
 }
 
 export async function getCommentsByVideoId(request: IGetCommentsRequest, email: string): Promise<IYoutubeComments | null> {
+  console.log("request: ", request);
   const offset = (request.pageNumber-1) * request.recordsPerPage;
   const queryParams = [];
   let query = `SELECT yc.*, COUNT(*) OVER() as totalCount FROM youtube_comments yc
@@ -96,20 +97,20 @@ export async function getCommentsByVideoId(request: IGetCommentsRequest, email: 
                 JOIN user_details ud ON ud.userId = uvm.userId
                 WHERE yc.videoId = ? AND ud.email = ? `;
   queryParams.push(...[request.videoId, email]);
-  if(isNullOrEmpty(request.columnFilters)) {
+  if(!isNullOrEmpty(request.columnFilters)) {
     request.columnFilters.map(filter => {
       filter.field = filter.field?.trim();
       if(['Sentiment', 'Offensive', 'Intent'].indexOf(filter.field) != -1 && !isNullOrEmpty(filter.values)) {
-        query += ` AND ${filter.field} IN ( ? ) `;
-        queryParams.push(`'${ filter.values.filter(v => v != null).join("','") }'`);
+        query += ` AND yc.${filter.field} IN ( ? ) `;
+        queryParams.push(filter.values);
       }
     });
   }
   query += ` GROUP BY yc.id, uvm.userId LIMIT ? , ?`;
-  queryParams.push(...[offset.toString(), request.recordsPerPage.toString()]);
+  queryParams.push(...[offset, request.recordsPerPage]);
   console.log("query: ", query);
   console.log("params: ", queryParams);
-  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, queryParams);
+  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.query(query, queryParams);
   if(rows.length == 0) {
     return null;
   }

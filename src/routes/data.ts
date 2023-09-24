@@ -47,7 +47,7 @@ router.get('/getPendingVideoIds', async (req: Request, res: Response) => {
 
 router.post('/getComments', async (req: Request, res: Response) => {
   const email = req.body['session']['email'];
-  const getCommentsRequest: IGetCommentsRequest = req.body as IGetCommentsRequest;
+  const getCommentsRequest: IGetCommentsRequest = req.body;
   const result = await getComments(getCommentsRequest, email);
   sendResponse(result, res);
 });
