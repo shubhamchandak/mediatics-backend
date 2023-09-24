@@ -70,10 +70,10 @@ export async function getComments(request: IGetCommentsRequest, email: string) {
     if(!(Number.isInteger(request.pageNumber) && Number.isInteger(request.recordsPerPage))) {
         return errorResponse("pageNumber and recordsPerPage should be valid integers!", 400);
     }
-    if(pageNumber < 1 || recordsPerPage < 1) {
+    if(request.pageNumber < 1 || request.recordsPerPage < 1) {
         return errorResponse("pageNumber and recordsPerPage should be greater than zero!", 400);
     }
-    const response = await dbService.getCommentsByVideoId(videoId, pageNumber, recordsPerPage, email);
+    const response = await dbService.getCommentsByVideoId(request, email);
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
