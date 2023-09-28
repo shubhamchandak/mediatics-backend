@@ -1,6 +1,7 @@
 export interface ServiceResponse {
     data?: any;
-    error?: ServiceError   
+    statusCode?: number;
+    error?: ServiceError;   
 }
 
 export interface ServiceError {

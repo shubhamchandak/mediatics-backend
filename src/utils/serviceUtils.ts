@@ -8,6 +8,9 @@ export function errorResponse(message: string, errorCode: number): ServiceRespon
     }};
 }
 
-export function successResponse(data?: any): ServiceResponse {
-    return {data: isNullOrEmpty(data) ? {} : data};
+export function successResponse(data?: any, statusCode?: number): ServiceResponse {
+    return {
+        data: isNullOrEmpty(data) ? {} : data, 
+        statusCode: statusCode
+    };
 }

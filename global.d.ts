@@ -9,6 +9,7 @@ declare global {
             DB_PASSWORD: string;
             DB_NAME: string;
             ALLOWED_ORIGINS: string;
+            AMQP_URL: string;
         }
     }
 }

@@ -5,6 +5,7 @@ import { isNullOrEmpty } from "../utils/utils.js";
 import { errorResponse, successResponse } from "../utils/serviceUtils.js";
 import assert from "assert";
 import { IGetCommentsRequest } from "../models/apimodels.js";
+import * as queueService from "./queueService.js";
 
 export async function getSentimentCount(videoId: string, email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(videoId)) {
@@ -92,6 +93,13 @@ export async function processVideo(videoUrl: string, email: string): Promise<Ser
     const processVideo = await dbService.processVideoByVideoId(videoId, new Date(), email);
     if(processVideo) {
         // call queueService to process videoId by MLService 
+        console.log("sending to queue!!!")
+        queueService.publishMessage({
+            videoId: videoId,
+            type: "add"
+        });
+    } else {
+        return successResponse("Request already in process!", 202);
     }
     return successResponse();
 }
