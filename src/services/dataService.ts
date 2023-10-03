@@ -81,6 +81,17 @@ export async function getComments(request: IGetCommentsRequest, email: string) {
     return successResponse(response);
 }
 
+export async function getCommentsSummary(videoId: string, email: string): Promise<ServiceResponse> {
+    if(isNullOrEmpty(videoId)) {
+        return errorResponse("videoId is required!", 400);
+    }
+    const response = await dbService.getCommentsSummary(videoId, email);
+    if(isNullOrEmpty(response)) {
+        return errorResponse("Data not found!", 404);
+    }
+    return successResponse(response);
+}
+
 export async function processVideo(videoUrl: string, email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(videoUrl)) {
         return errorResponse("Video url is required!", 400);

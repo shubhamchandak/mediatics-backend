@@ -8,9 +8,9 @@ export async function publishMessage(message: any) {
     const channel = await connection.createChannel();
 
     await channel.assertQueue(queueName);
-    console.log(`Sending to queue: ${message}`);
+    console.log(`Sending to queue: ${JSON.stringify(message)}`);
     const res = channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)));
-    console.log(`Sent: '${message}', queue_response: ${res}`);
+    console.log(`Sent: ${JSON.stringify(message)}, queue_response: ${res}`);
     
     await channel.close();
     await connection.close();

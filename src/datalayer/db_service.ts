@@ -1,6 +1,6 @@
 import * as mysql from 'mysql2/promise'
 import { IIntentCount, IOffensiveCount, ISentimentCount, IUserDetails, IVideoDetails, IYoutubeComment, IYoutubeComments } from '../models/dbmodels.js';
-import { IGetCommentsRequest } from '../models/apimodels.js';
+import { ICommentsSummary, IGetCommentsRequest } from '../models/apimodels.js';
 import { isNullOrEmpty } from '../utils/utils.js';
 
 var connection = await mysql.createConnection({
@@ -78,6 +78,24 @@ export async function getOffensiveCountByVideoId(videoId: string, email: string)
                 WHERE yc.videoId = ? AND ud.email = ? GROUP BY offensive`;
   const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [videoId, email]);
   return rows as IOffensiveCount[];
+}
+
+export async function getCommentsSummary(videoId: string, email: string): Promise<ICommentsSummary | null> {
+  const query = `SELECT * FROM youtube_comments_summary ycs
+                JOIN user_video_mapping uvm ON uvm.videoId = ycs.videoId
+                JOIN user_details ud ON uvm.userId = ud.userId 
+                WHERE ycs.videoId = ? AND ud.email = ?`;
+  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [videoId, email]);
+  if(isNullOrEmpty(rows)) {
+    return null;
+  }
+  const result = rows[0];
+  return {
+    topTopics: result["top_topics"],
+    positiveFeedback: result["positive_topics"],
+    negativeFeedback: result["negative_topics"],
+    suggestions: result["suggestion_topics"]
+  };
 }
 
 export async function getPendingVideoIdsByUser(email: string): Promise<string[]> {

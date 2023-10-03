@@ -16,3 +16,9 @@ export interface IColumnFilter {
     values: string[];
 }
 
+export interface ICommentsSummary {
+    topTopics: string;
+    positiveFeedback: string;
+    negativeFeedback: string;
+    suggestions: string;
+}
