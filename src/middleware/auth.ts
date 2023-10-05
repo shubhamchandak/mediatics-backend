@@ -12,7 +12,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         }
         req.body["session"] = data;
         req.body["session"]["firstName"] = data?.given_name;
-        req.body["session"]["lastName"] = data?.family_name;
+        req.body["session"]["lastName"] = data?.family_name ? data?.family_name : "";
         next();
     })
     .catch(err => {

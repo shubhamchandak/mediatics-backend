@@ -18,11 +18,15 @@ export async function getUserByEmail(email: string): Promise<ServiceResponse> {
 }
 
 export async function createNewUser(request: ICreateNewUserRequest): Promise<ServiceResponse> {
-    if(isNullOrEmpty(request.firstName) || isNullOrEmpty(request.lastName)) {
-        return errorResponse("First and Last Name cannot be empty!", 400)
+    if(isNullOrEmpty(request.firstName)) {
+        return errorResponse("First Name cannot be empty!", 400)
     }
     if(isNullOrEmpty(request.email) || !validateEmail(request.email)) {
         return errorResponse("Email is not valid!", 400);
+    }
+    const userData = await dbService.getUserByEmail(request.email);
+    if(!isNullOrEmpty(userData)) {
+        return errorResponse("User already exist!", 403);
     }
     const userDetails: IUserDetails = {
         firstName: request.firstName,
