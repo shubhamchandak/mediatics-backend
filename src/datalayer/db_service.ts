@@ -30,11 +30,11 @@ export async function getUserVideosByEmail(email: string): Promise<IVideoDetails
 }
 
 export async function createNewUser(userDetails: IUserDetails): Promise<boolean> {
-  const query = 'INSERT INTO user_details (firstName, lastName, email, createdOn, updatedOn, status) VALUES (?, ?, ?, ?, ?, ?)';
+  const query = 'INSERT INTO user_details (firstName, lastName, email, createdOn, updatedOn, status, credits) VALUES (?, ?, ?, ?, ?, ?, ?)';
   try {
     const createdOn = getMySqlTimeString(userDetails.createdOn)
     const updatedOn = getMySqlTimeString(userDetails.updatedOn)
-    await connection.execute(query, [userDetails.firstName, userDetails.lastName, userDetails.email, createdOn, updatedOn, 1]);
+    await connection.execute(query, [userDetails.firstName, userDetails.lastName, userDetails.email, createdOn, updatedOn, 1, 0]);
   } catch(error) {
     console.log(error);
     return false;
@@ -170,6 +170,32 @@ export async function processVideoByVideoId(videoId: string, createdOn: Date, em
     return false;
   }
   return true;
+}
+
+export async function checkFreeEntryForToday(email: string): Promise<boolean> {
+  const FREE_DAILY_LIMIT = 1; 
+  const query = `SELECT COUNT(*) AS free_entry_count
+                FROM usage_audit ua
+                JOIN user_details ud ON ua.userId = ud.userId
+                WHERE ud.email = ? 
+                AND DATE(ua.createdOn)=CURDATE() 
+                AND ua.creditUsage = 0`
+  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [email]);
+  return rows[0]['free_entry_count'] < FREE_DAILY_LIMIT;
+}
+
+export async function getAvailableCredits(email: string): Promise<number> {
+  const query = `SELECT credits FROM user_details WHERE email = ?`
+  const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [email]);
+  return rows[0]["credits"];
+}
+
+export async function addTransaction(email: string, videoId: string, creditUsage: number, transactionType: string) {
+  const query = `INSERT INTO usage_audit (userId, videoId, creditUsage, transactionType, createdOn) 
+                SELECT userId, ?, ?, ?, ? FROM user_details ud
+                WHERE ud.email = ?`;
+  const createdOnString = getMySqlTimeString(new Date());
+  await connection.execute(query, [videoId, creditUsage, transactionType, createdOnString, email]);
 }
 
 function getMySqlTimeString(datetime: Date): string {

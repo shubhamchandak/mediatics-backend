@@ -101,16 +101,28 @@ export async function processVideo(videoUrl: string, email: string): Promise<Ser
         return errorResponse("Video url is not valid!", 400);
     }
     assert (videoId != null);
+    const freeEntry = await dbService.checkFreeEntryForToday(email);
+    if(!freeEntry) {
+        const credits = await dbService.getAvailableCredits(email);
+        if(credits == 0) {
+            return errorResponse("Free credits exhausted! Please try again tomorrow or upgrade to premium plans.", 403);
+        }
+    }
     const processVideo = await dbService.processVideoByVideoId(videoId, new Date(), email);
     if(processVideo) {
-        // call queueService to process videoId by MLService 
-        console.log("sending to queue!!!")
-        queueService.publishMessage({
-            videoId: videoId,
-            type: "add"
-        });
+        processVideoByMLService(videoId, "add");
+        dbService.addTransaction(email, videoId, freeEntry ? 0 : 1, "add");
     } else {
         return successResponse("Request already in process!", 202);
     }
     return successResponse();
+}
+
+function processVideoByMLService(videoId: string, operationType: string) {
+    // call queueService to process videoId by MLService 
+    console.log("sending to queue!!!")
+    queueService.publishMessage({
+        videoId: videoId,
+        type: operationType
+    });
 }
