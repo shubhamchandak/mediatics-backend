@@ -5,7 +5,9 @@ dotenv.config()
 
 import userRouter from './routes/user.js';
 import dataRouter from './routes/data.js';
-import { authenticate } from './middleware/auth.js';
+import loginRouter from './routes/login.js';
+import * as googleAuth from './middleware/googleAuth.js';
+import * as jwtAuth from './middleware/jwtAuth.js';
 import cors, { CorsOptions } from 'cors';
 
 const app: Express = express()
@@ -26,8 +28,9 @@ app.use(cookieParser());
 
 const port = process.env.PORT || 3000
 
-app.use('/user', authenticate, userRouter);
-app.use('/data', authenticate, dataRouter);
+app.use('/login', googleAuth.authenticate, loginRouter);
+app.use('/user', jwtAuth.authenticate, userRouter);
+app.use('/data', jwtAuth.authenticate, dataRouter);
 
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
   res.send('Hello World!!!!!!!')

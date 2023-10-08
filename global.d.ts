@@ -10,6 +10,7 @@ declare global {
             DB_NAME: string;
             ALLOWED_ORIGINS: string;
             AMQP_URL: string;
+            TOKEN_SECRET: string;
         }
     }
 }

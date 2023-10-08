@@ -1,0 +1,1 @@
+export const ACCESS_TOKEN_EXPIRY_MS = 3600000;
