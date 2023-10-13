@@ -43,9 +43,14 @@ export async function createNewUser(userDetails: IUserDetails): Promise<boolean>
 }
 
 export async function getVideoDetails(videoId: string, email: string): Promise<IVideoDetails | null> {
-  const query = `SELECT yvd.* FROM youtube_video_details yvd
+  const query = `SELECT yvd.*, CASE
+                  WHEN ycs.videoId IS NOT NULL THEN 1
+                  ELSE 0
+                END AS summary
+                FROM youtube_video_details yvd
                 JOIN user_video_mapping uvm ON yvd.videoId = uvm.videoId
                 JOIN user_details ud ON uvm.userId = ud.userId
+                JOIN youtube_comments_summary ycs ON ycs.videoId = yvd.videoId 
                 WHERE yvd.videoId = ? AND ud.email = ?`;
   const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [videoId, email]);
   if(rows.length == 0)
@@ -98,11 +103,14 @@ export async function getCommentsSummary(videoId: string, email: string): Promis
   };
 }
 
-export async function getPendingVideoIdsByUser(email: string): Promise<string[]> {
+export async function getPendingVideoIdsByUser(email: string): Promise<string[] | null> {
   const query = `SELECT uvm.videoId FROM user_video_mapping uvm
                 JOIN user_details ud ON uvm.userId = ud.userId
                 WHERE ud.email = ? AND uvm.videoId NOT IN (SELECT DISTINCT videoId FROM youtube_video_details)`
   const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [email]);
+  if(isNullOrEmpty(rows)) {
+    return null;
+  }
   return rows.map(x => x["videoId"]);
 }
 

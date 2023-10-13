@@ -15,7 +15,7 @@ export async function getSentimentCount(videoId: string, email: string): Promise
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
-    return successResponse(response)
+    return successResponse(response);
 }
 
 export async function getIntentCount(videoId: string, email: string): Promise<ServiceResponse>  {
@@ -26,7 +26,7 @@ export async function getIntentCount(videoId: string, email: string): Promise<Se
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
-    return successResponse(response)
+    return successResponse(response);
 }
 
 export async function getOffensiveCount(videoId: string, email: string): Promise<ServiceResponse>  {
@@ -37,7 +37,7 @@ export async function getOffensiveCount(videoId: string, email: string): Promise
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
-    return successResponse(response)
+    return successResponse(response);
 }
 
 export async function getVideoDetails(videoId: string, email: string): Promise<ServiceResponse>  {
@@ -48,7 +48,7 @@ export async function getVideoDetails(videoId: string, email: string): Promise<S
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
-    return successResponse(response)
+    return successResponse(response);
 }
 
 export async function getUserVideos(email: string): Promise<ServiceResponse>  {
@@ -56,11 +56,14 @@ export async function getUserVideos(email: string): Promise<ServiceResponse>  {
     if(isNullOrEmpty(response)) {
         return errorResponse("Data not found!", 404);
     }
-    return successResponse(response)
+    return successResponse(response);
 }
 
 export async function getPendingVideoIds(email: string) {
     const response = await dbService.getPendingVideoIdsByUser(email);
+    if(isNullOrEmpty(response)) {
+        return errorResponse("Data not found!", 404);
+    }
     return successResponse(response);
 }
 
