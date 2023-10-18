@@ -20,7 +20,13 @@ export async function getUserByEmail(email: string): Promise<IUserDetails | null
 }
 
 export async function getUserVideosByEmail(email: string): Promise<IVideoDetails[]> {
-  const query = `SELECT * FROM youtube_video_details WHERE videoId in 
+  const query = `SELECT yvd.*, CASE
+                  WHEN ycs.videoId IS NOT NULL THEN 1
+                  ELSE 0
+                END AS summary_status
+                FROM youtube_video_details yvd 
+                JOIN youtube_comments_summary ycs ON ycs.videoId = yvd.videoId
+                WHERE videoId in 
                 (SELECT uvm.videoId 
                 FROM user_video_mapping uvm 
                 INNER JOIN user_details ud ON uvm.userId = ud.userId 
@@ -46,7 +52,7 @@ export async function getVideoDetails(videoId: string, email: string): Promise<I
   const query = `SELECT yvd.*, CASE
                   WHEN ycs.videoId IS NOT NULL THEN 1
                   ELSE 0
-                END AS summary
+                END AS summary_status
                 FROM youtube_video_details yvd
                 JOIN user_video_mapping uvm ON yvd.videoId = uvm.videoId
                 JOIN user_details ud ON uvm.userId = ud.userId
