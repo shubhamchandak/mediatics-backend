@@ -112,7 +112,7 @@ export async function getCommentsSummary(videoId: string, email: string): Promis
 export async function getPendingVideoIdsByUser(email: string): Promise<string[] | null> {
   const query = `SELECT uvm.videoId FROM user_video_mapping uvm
                 JOIN user_details ud ON uvm.userId = ud.userId
-                WHERE ud.email = ? AND uvm.videoId NOT IN (SELECT DISTINCT videoId FROM youtube_video_details)`
+                WHERE ud.email = ? AND uvm.videoId NOT IN (SELECT DISTINCT videoId FROM youtube_comments_summary)`
   const [rows, _]: [mysql.RowDataPacket[], mysql.FieldPacket[]] = await connection.execute(query, [email]);
   if(isNullOrEmpty(rows)) {
     return null;
