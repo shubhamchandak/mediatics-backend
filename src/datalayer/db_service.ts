@@ -26,7 +26,7 @@ export async function getUserVideosByEmail(email: string): Promise<IVideoDetails
                 END AS summary_status
                 FROM youtube_video_details yvd 
                 JOIN youtube_comments_summary ycs ON ycs.videoId = yvd.videoId
-                WHERE videoId in 
+                WHERE yvd.videoId in 
                 (SELECT uvm.videoId 
                 FROM user_video_mapping uvm 
                 INNER JOIN user_details ud ON uvm.userId = ud.userId 
